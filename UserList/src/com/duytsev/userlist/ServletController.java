@@ -10,7 +10,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 /**
- * Servlet implementation class ServletController
+ * Application controller
  */
 @WebServlet("/ServletController")
 public class ServletController extends HttpServlet {

@@ -8,6 +8,11 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+/*
+ * Data Access Object class
+ * Connects Oracle DB using jdbc
+ */
+
 public class UserBeanDao {
 	
 	private String errorLog;

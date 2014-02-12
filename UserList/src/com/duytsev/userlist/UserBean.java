@@ -1,5 +1,10 @@
 package com.duytsev.userlist;
 
+/*
+ * Simple Java Bean class 
+ * Apllication model
+ */
+
 public class UserBean {
 	private String firstName;
 	private String lastName;
