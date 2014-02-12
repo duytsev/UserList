@@ -31,7 +31,8 @@
 				 
 				    E-mail: <input type = "text" value = "" name = email><br>
 			  </div>  
-			<input type = "submit" name = sb value = "Add">
+			<input type = "submit" name = action value = "Add">
+			<input type = "submit" name = action value = "Show all">
 		</form>
 	<hr>
 	
@@ -51,6 +52,10 @@
 					<td> <c:out value = "${user.firstName}"/> </td>
 					<td> <c:out value = "${user.lastName}"/> </td>
 					<td> <c:out value = "${user.email}"/> </td>
+					<td>
+						<a href = "ServletController?action=delete&userMail=
+						<c:out value = "${user.email}"/>">Delete</a>
+					</td>
 				</tr>
 			</c:forEach>
 		

@@ -30,19 +30,22 @@ public class ServletController extends HttpServlet {
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		
-		UserBean user = new UserBean();
-		
-		user.setFirstName(request.getParameter("f_name"));
-		user.setLastName(request.getParameter("l_name"));
-		user.setEmail(request.getParameter("email"));
-		
 		dao.connectDB();
-		dao.addUser(user);
+		
+		if (request.getParameter("action").equalsIgnoreCase("delete")) {
+			dao.deleteUser(request.getParameter("userMail"));			
+		}
+		else if(request.getParameter("action").equalsIgnoreCase("add")){
+			UserBean user = new UserBean();
+			user.setFirstName(request.getParameter("f_name"));
+			user.setLastName(request.getParameter("l_name"));
+			user.setEmail(request.getParameter("email"));
+			dao.addUser(user);
+		}
 		
 		request.setAttribute("userlist", dao.getAllUsers());
 		RequestDispatcher rd = request.getRequestDispatcher("/index.jsp");
 		rd.forward(request, response);
-		
 	}
 	
 

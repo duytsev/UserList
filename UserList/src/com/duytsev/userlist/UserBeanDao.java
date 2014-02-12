@@ -19,6 +19,23 @@ public class UserBeanDao {
 	private Connection con;
 	
 	private boolean isUserExist(UserBean user) {
+		
+
+		
+		PreparedStatement preStatement = null;
+		try {
+			preStatement = con.prepareStatement("SELECT * FROM AA_USERS WHERE FNAME = ? AND LNAME = ?");
+			preStatement.setString(1, user.getFirstName());
+			preStatement.setString(2, user.getLastName());
+			
+			ResultSet rs = preStatement.executeQuery();
+			
+			return rs.isBeforeFirst();
+			
+		} catch (SQLException e) {
+			errorLog = "Failed to check if user exists";
+			e.printStackTrace();
+		}
 		return false;
 		
 	}
@@ -45,24 +62,43 @@ public class UserBeanDao {
 	
 	public void addUser(UserBean user) {
 		
-		PreparedStatement preStatement = null;
+		if (!isUserExist(user)) {
+			PreparedStatement preStatement = null;
+			try {
+
+				preStatement = con
+						.prepareStatement("INSERT INTO AA_USERS(USER_ID, FNAME, "
+								+ "LNAME, EMAIL) VALUES(?, ?, ?, ?)");
+
+				preStatement.setString(1, "");
+				preStatement.setString(2, user.getFirstName());
+				preStatement.setString(3, user.getLastName());
+				preStatement.setString(4, user.getEmail());
+
+				preStatement.executeUpdate();
+
+			} catch (SQLException e) {
+				errorLog = "Failed to add user";
+				e.printStackTrace();
+			}
+		}
+		
+	}
+	
+	public void deleteUser(String email) {
 		try {
 			
-			preStatement = con.prepareStatement("INSERT INTO AA_USERS(USER_ID, FNAME, "
-					+ "LNAME, EMAIL) VALUES(?, ?, ?, ?)");
+			PreparedStatement preStatement = con.prepareStatement("DELETE "
+					+ "FROM AA_USERS WHERE EMAIL = ?");
 			
-			preStatement.setString(1, "");
-			preStatement.setString(2, user.getFirstName());
-			preStatement.setString(3, user.getLastName());
-			preStatement.setString(4, user.getEmail());
+			preStatement.setString(1, email);
 			
 			preStatement.executeUpdate();
 			
 		} catch (SQLException e) {
-			errorLog = "Failed to add user";
+			errorLog = "Failed to delete user";
 			e.printStackTrace();
 		}
-		
 	}
 	
 	public List<UserBean> getAllUsers() {
@@ -73,8 +109,7 @@ public class UserBeanDao {
 		try {
 			preStatement = con.prepareStatement("SELECT * FROM AA_USERS");
 		
-			ResultSet rs = null;
-			rs = preStatement.executeQuery();
+			ResultSet rs = preStatement.executeQuery();
 			
 			while(rs.next()) {
 				UserBean user = new UserBean();
