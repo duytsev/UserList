@@ -8,62 +8,90 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.naming.Context;
+import javax.naming.InitialContext;
+import javax.naming.NamingException;
+import javax.sql.DataSource;
+
 /*
  * Data Access Object class
  * Connects Oracle DB using jdbc
  */
 
 public class UserBeanDao {
-	
+
 	private String errorLog;
 	private Connection con;
-	
-	private boolean isUserExist(UserBean user) {
-		
+	private ResultSet rs;
+	private PreparedStatement preStatement;
 
-		
-		PreparedStatement preStatement = null;
+	private boolean isUserExist(UserBean user) {
+
 		try {
-			preStatement = con.prepareStatement("SELECT * FROM AA_USERS WHERE FNAME = ? AND LNAME = ?");
+			preStatement = con
+					.prepareStatement("SELECT * FROM AA_USERS WHERE FNAME = ? AND LNAME = ?");
 			preStatement.setString(1, user.getFirstName());
 			preStatement.setString(2, user.getLastName());
-			
-			ResultSet rs = preStatement.executeQuery();
-			
+
+			rs = preStatement.executeQuery();
+
 			return rs.isBeforeFirst();
-			
+
 		} catch (SQLException e) {
 			errorLog = "Failed to check if user exists";
 			e.printStackTrace();
 		}
 		return false;
-		
+
 	}
-	
-	public void connectDB(){
-		
+
+	public void connectDB() {
+
+		DataSource ds = null;
+
 		try {
-			Class.forName("oracle.jdbc.driver.OracleDriver");
-		} catch (ClassNotFoundException e) {
-			errorLog = "Failed to load the jdbc driver";
-			e.printStackTrace();
+			Context ctx = new InitialContext();
+			ds = (DataSource) ctx.lookup("java:/jdbc/testAppDS");
+		} catch (NamingException e1) {
+			e1.printStackTrace();
 		}
-		
+
 		try {
-			con = DriverManager.getConnection("jdbc:oracle:thin:@localhost:1521:xe", "system",
-						"dbduika");
+			con = ds.getConnection();
+		} catch (SQLException e1) {
+			e1.printStackTrace();
+		}
+
+		/*
+		 * try {
+		 * 
+		 * Class.forName("oracle.jdbc.driver.OracleDriver"); } catch
+		 * (ClassNotFoundException e) { errorLog =
+		 * "Failed to load the jdbc driver"; e.printStackTrace(); }
+		 * 
+		 * try { con =
+		 * DriverManager.getConnection("jdbc:oracle:thin:@localhost:1521:xe",
+		 * "system", "dbduika"); } catch (SQLException e) { errorLog =
+		 * "Failed to connect database"; e.printStackTrace(); }
+		 */
+
+	}
+
+	public void closeConnection() {
+
+		try {
+			rs.close();
+			preStatement.close();
+			con.close();
 		} catch (SQLException e) {
-			errorLog = "Failed to connect database";
 			e.printStackTrace();
 		}
-		
-		
+
 	}
-	
+
 	public void addUser(UserBean user) {
-		
+
 		if (!isUserExist(user)) {
-			PreparedStatement preStatement = null;
 			try {
 
 				preStatement = con
@@ -82,42 +110,41 @@ public class UserBeanDao {
 				e.printStackTrace();
 			}
 		}
-		
+
 	}
-	
+
 	public void deleteUser(String email) {
 		try {
-			
-			PreparedStatement preStatement = con.prepareStatement("DELETE "
+
+			preStatement = con.prepareStatement("DELETE "
 					+ "FROM AA_USERS WHERE EMAIL = ?");
-			
+
 			preStatement.setString(1, email);
-			
+
 			preStatement.executeUpdate();
-			
+
 		} catch (SQLException e) {
 			errorLog = "Failed to delete user";
 			e.printStackTrace();
 		}
 	}
-	
+
 	public List<UserBean> getAllUsers() {
-		
+
 		List<UserBean> users = new ArrayList<UserBean>();
-		
-		PreparedStatement preStatement = null;
+
 		try {
 			preStatement = con.prepareStatement("SELECT * FROM AA_USERS");
-		
-			ResultSet rs = preStatement.executeQuery();
-			
-			while(rs.next()) {
+
+			rs = preStatement.executeQuery();
+
+			while (rs.next()) {
 				UserBean user = new UserBean();
-				
+
 				user.setFirstName(rs.getString("FNAME"));
 				user.setLastName(rs.getString("LNAME"));
 				user.setEmail(rs.getString("EMAIL"));
-				
+
 				users.add(user);
 
 			}
@@ -125,9 +152,9 @@ public class UserBeanDao {
 			errorLog = "Failed to get user list";
 			e.printStackTrace();
 		}
-		
+
 		return users;
-		
+
 	}
-	
+
 }
