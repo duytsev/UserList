@@ -51,7 +51,7 @@ public class ServletController extends HttpServlet {
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
-			dao.closeConnection();
+			dao.close();
 		}
 	}
 

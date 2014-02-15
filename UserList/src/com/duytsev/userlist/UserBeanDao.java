@@ -1,5 +1,7 @@
 package com.duytsev.userlist;
 
+import java.io.Closeable;
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -18,7 +20,7 @@ import javax.sql.DataSource;
  * Connects Oracle DB using jdbc
  */
 
-public class UserBeanDao {
+public class UserBeanDao implements Closeable {
 
 	private String errorLog;
 	private Connection con;
@@ -77,8 +79,8 @@ public class UserBeanDao {
 
 	}
 
-	public void closeConnection() {
-
+	@Override
+	public void close() throws IOException {
 		try {
 			rs.close();
 			preStatement.close();
@@ -86,7 +88,6 @@ public class UserBeanDao {
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-
 	}
 
 	public void addUser(UserBean user) {
